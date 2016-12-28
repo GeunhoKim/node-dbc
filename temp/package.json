@@ -1,0 +1,18 @@
+{
+  "name": "node-dcm",
+  "version": "0.0.1",
+  "description": "Data Connection Manager for Nodejs",
+  "main": "app.js",
+  "dependencies": {
+    "config": "^1.21.0",
+    "hashmap": "^2.0.6",
+    "restify-clients": "^1.5.0",
+    "mssql": "^3.3.0"
+  },
+  "devDependencies": {
+    "mocha": "^3.1.1",
+    "chai": "^3.5.0",
+    "debug": "^2.2.0",
+    "sqlite3": "^3.1.6"
+  }
+}
