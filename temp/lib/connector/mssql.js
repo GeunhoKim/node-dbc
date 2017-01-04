@@ -1,47 +1,71 @@
 'use strict';
 
 var debug = require('debug')('connector/mssql');
-var delegator = require('../delegator/kerberos.js');
 var sql = require('mssql');
 
-
+// CONNECTOR FOR MSSQL
+// -------------------------------------------------
 var mssql = {
-  Request: sql.Request,
-  Int: sql.Int,
-  VarChar: sql.VarChar,
 
-  getConnection: getConnection
+  // public members
+  // ------------------------------------------------
+  Request: sql.Request,
+
+  Bit: sql.Bit,
+  BigInt: sql.BigInt,
+  Decimal: sql.Decimal, // ([precision], [scale])
+  Float: sql.Float,
+  Int: sql.Int,
+  Money: sql.Money,
+  Numeric: sql.Numeric, // ([precision], [scale])
+  SmallInt: sql.SmallInt,
+  SmallMoney: sql.SmallMoney,
+  Real: sql.Real,
+  TinyInt: sql.TinyInt,
+
+  Char: sql.Char, // ([length])
+  NChar: sql.NChar, // ([length])
+  Text: sql.Text,
+  NText: sql.NText,
+  VarChar: sql.VarChar, // ([length])
+  NVarChar: sql.NVarChar, // ([length])
+  Xml: sql.Xml,
+
+  Time: sql.Time, // ([scale])
+  Date: sql.Date,
+  DateTime: sql.DateTime,
+  DateTime2: sql.DateTime2, // ([scale])
+  DateTimeOffset: sql.DateTimeOffset, // ([scale])
+  SmallDateTime: sql.SmallDateTime,
+
+  UniqueIdentifier: sql.UniqueIdentifier,
+
+  Variant: sql.Variant,
+
+  Binary: sql.Binary,
+  VarBinary: sql.VarBinary, // ([length])
+  Image: sql.Image,
+
+  UDT: sql.UDT,
+  Geography: sql.Geography,
+  Geometry: sql.Geometry,
+
+  // public methods
+  // ------------------------------------------------
+
+  GetRequest : getRequest,
+  GetTransaction: getTransaction
 };
 
 
-/**
- *
- * @param Config
- * {dbms, server, port, database, username, password}
- *
- * @returns Connection
- */
-function getConnection(config, cb) {
-  var conn = new sql.Connection(config).connect(function connect(err) {
-      if (err) {
-        // TODO: error handling 추가
-        debug('Exception occurs while connect().');
-        debug(err);
 
-        cb(err);
-      } else {
-        // TODO: connect 성공에 대한 handling 추가
-        debug('Successfully Connected.');
-        debug('-----------------------');
-        debug('Server: ' + config.server);
-        debug('Database: ' + config.database);
+function getRequest(conn, cb) {
 
-        cb(null, conn);
-      }
-    });
 }
 
+function getTransaction(conn, cb) {
 
+}
 
 
 module.exports = mssql;

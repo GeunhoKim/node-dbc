@@ -1,19 +1,19 @@
 'use strict';
 
-var debug = require('debug')('delegator/kerberos');
-//var config = require('config');
+var debug = require('debug')('delegator');
 //var kerberos = require('kerberos');
 var restify = require('restify-clients');
-
-var pjson = require('../../package.json');
 var os = require('os');
-var serviceConfig = require('./service-conig.json');
+
+var pjson = require('../package.json');
+var serviceConfig = require('./config/delegator.json');
 serviceConfig.userAgent = 'DCM-Client/' + pjson.version + ' (' + os.type() + '; ' + os.release() + '; '
   + os.platform() + ')  NodeJS/' + process.versions.node;
+
 var client = restify.createJsonClient(serviceConfig);
 
 var delegator = {
-  requestConnectionString: requestConnectionString,
+  GetConnectionString: getConnectionString
 
 };
 
@@ -22,7 +22,7 @@ var delegator = {
  * @param applicationName
  * @param connectionName
  */
-function requestConnectionString(applicationName, connectionName, cb) {
+function getConnectionString(applicationName, connectionName, cb) {
   var path = '/api/Connection/' + applicationName + '/' + connectionName;
   client.get(path, function(err,  req, res, obj) {
     if (err) { cb(err, res); }
