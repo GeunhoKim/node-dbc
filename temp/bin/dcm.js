@@ -30,28 +30,3 @@ var mssql = require("../lib/connector/mssql.js");
     });
   //}
 //});
-
-/*
-var connection = new sql.Connection({
-    user: 'pdprofile',
-    password: 'ppf',
-    server: 'bcdb3',
-    database: 'ArcheAccount'
-}).connect(function(err) {
-    if (err) {
-        console.log(err);
-} else {
-    console.log('success.');
-
-    new sql.Request(connection)
-        .input('USERID', sql.VarChar(20), 'gkhim')
-        .execute('dbo.UPAR_API_Accounts_SelectAccounts')
-        .then(function(recordsets) {
-            console.dir(recordsets);
-        }).catch(function(err) {
-        console.log(err)
-    });
-}
-})
-  */
-

@@ -1,14 +1,13 @@
 'use strict';
 
 var debug = require('debug')('delegator');
-//var kerberos = require('kerberos');
 var restify = require('restify-clients');
 var os = require('os');
 
 var pjson = require('../package.json');
 var serviceConfig = require('./config/delegator.json');
 serviceConfig.userAgent = 'DCM-Client/' + pjson.version + ' (' + os.type() + '; ' + os.release() + '; '
-  + os.platform() + ')  NodeJS/' + process.versions.node;
++ os.platform() + ')  NodeJS/' + process.versions.node;
 
 var client = restify.createJsonClient(serviceConfig);
 
