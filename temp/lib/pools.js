@@ -183,22 +183,31 @@ function addMariaConnection(connName, config, cb) {
     charset: 'utf8'
   };
 
-  var factory = {
-    create: function(cb) {
-      var client = new maria(_config);
+  const factory = {
+    create: function() {
+      return new Promise(function(resolve, reject) {
+        var client = new maria(_config);
 
-      client.on('error', function(err) {
-        debug('Exception occurs on maria: %O', err.stack);
-      });
+        client.on('error', function(err) {
+          debug('Exception occurs on maria: %O', err.stack);
+        });
 
-      cb(null, client);
+        resolve(client);
+      })
     },
     destroy: function(client){
-      client.close();
+      return new Promise(function(resolve) {
+
+        client.on('close', function() {
+          resolve('maria client 가 정상적으로 종료 되었습니다.');
+        });
+
+        client.close();
+      });
     }
   };
 
-  var conn = gpool.createPool(factory, { max: 100, idleTimeoutMillis : 30000 });
+  var conn = gpool.createPool(factory, { max: 10, min: 3, idleTimeoutMillis : 30000 });
 
   // mariasql client 는 직접 connection 연결을 할 필요가 없음.
   // query 수행시 알아서 연결을 맺음. 즉, pool이 아닌 단일 connection임.

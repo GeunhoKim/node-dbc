@@ -38,28 +38,55 @@ var pools = require("../lib/pools");
 
 // MARIA CLIENT
 // ----------------------------------------------------------------
+/*
 var config = {
+  "dbms": "MARIA",
   "server": "localhost"
   , "port": "3306"
-  , "database": "kktadb"
-  , "username": "kktauser"
-  , "password": "kktauser"
+  , "database": "testdb"
+  , "username": "root"
+  , "password": ""
 };
 
 var connName = 'alkimtalk';
-pools.AddConnection(connName, config, function(err, conn) {
+pools.AddConnection(connName, config, function(err, msg) {
   if(err) debug('error occurs while add a connection. %O', err.stack);
-  else debug('add connection successfully. %O', conn);
+  else debug('add connection successfully. %O', msg);
 });
 
 var conn = pools.GetConnection(connName);
 
 conn.acquire().then(function(client) {
-  maria.Query(client, 'SELECT * FROM ata_mmt_log_201701 WHERE sender_key = :key'
-  , {key: '6496db376cfa8dbea72a3e8baed6f13e53aa21ae'}, function(err, rows) {
+  maria.Query(client, 'SELECT * FROM t1 WHERE id = :id', { id: 1 }, function(err, rows) {
       if (err) console.error(err);
       else console.dir(rows);
     });
 
   conn.release(client);
+}).catch(function(err) {
+  console.error(err);
 });
+*/
+
+var config = {
+  "applicationName": "DCM_TEST",
+  "connectionNames": ["dcmtest_read", "dcmtest_write"]
+};
+
+var dcm = require('../dcm');
+
+dcm.Init(config, function(msg) {
+  debug('Init. %s', msg);
+
+  dcm.Query('dcmtest_read', 'SELECT * FROM t1 WHERE id = :id', { id: 1 }, function(err, rows) {
+    if(err) debug('error occurs. %O', err.stack);
+    else debug('Success. %O', rows);
+  });
+});
+
+if(dcm.isInitialized) {
+  dcm.Query('dcmtest_read', 'SELECT * FROM t1', null, function(err, rows) {
+    if(err) debug('error occurs. %O', err.stack);
+    else debug('Success. %O', rows);
+  });
+}
