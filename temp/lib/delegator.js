@@ -1,5 +1,3 @@
-'use strict';
-
 var debug = require('debug')('delegator');
 var restify = require('restify-clients');
 var os = require('os');

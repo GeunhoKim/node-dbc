@@ -1,14 +1,14 @@
-'use strict';
-
 var debug = require('debug')('pools');
-var HashMap = require('hashmap');
+var hashmap = require('hashmap');
 var sql = require('mssql');
-var oracle = require('oracledb');
+//var oracle = require('oracledb');
 var maria = require('mariasql');
+var gpool = require('generic-pool');
 
 var constants = require('./constants.js');
 
-var _conns = new HashMap();
+var _conns = new hashmap(); // store connections
+var _connmap = new hashmap(); // store dbms type
 
 // -----------------------------------------------------------------------
 // Pools
@@ -41,11 +41,12 @@ var connstr = {
 /**
  *
  * @param Connection Name
- * @param Config {dbms, server, port, database, username, password}
+ * @param Config {dbms, server, port, db, username, password}
  * @param Callback
  */
 function addConnection(connName, config, cb) {
   var dbmsEnum = constants.GetDbmsEnum(config.dbms);
+  _connmap.set(connName, config.dbms);
 
   switch(dbmsEnum){
     case constants.dbmsEnums.MSSQL:
@@ -58,8 +59,7 @@ function addConnection(connName, config, cb) {
 
     case constants.dbmsEnums.ORACLE:
     default:
-      cb(new Error('NotImplementedException'),
-        '아직 지원하지 않는 DBMS 입니다. [' + constants.dbmsStrs[dbmsEnum] + ']');
+      addOracleConnection(connName, config, cb);
       break;
   }
 }
@@ -72,13 +72,26 @@ function addConnection(connName, config, cb) {
  */
 function closeConnection(connName, cb) {
 
+  if (!_conns.has(connName) || !_connmap.has(connName))
+    return;
+
   var conn = _conns.get(connName);
+  var dbms = _connmap.get(connName);
 
-  if(typeof conn == maria) {
-    conn.end();
+  var dbmsEnum = constants.GetDbmsEnum(dbms);
 
-    _conns.remove(connName);
+  switch(dbmsEnum) {
+    case constants.dbmsEnums.MARIA:
+      conn.destroy();
+      break;
+
+    case constants.dbmsEnums.ORACLE:
+    case constants.dbmsEnums.MSSQL:
+    default:
+      break;
   }
+
+  _conns.remove(connName);
 }
 
 /**
@@ -89,8 +102,9 @@ function closeConnection(connName, cb) {
 function getConnection(connName) {
   var connection = null;
 
-  if(_conns.has(connName))
+  if(_conns.has(connName)) {
     connection = _conns.get(connName);
+  }
 
   return connection;
 }
@@ -99,17 +113,24 @@ function getConnection(connName) {
 // -----------------------------------------------------------------------
 // private functions
 /**
- *
  * MSSQL Connection 객체 생성 및 연결
  * @parma Connection Name
- * @param Config {server, port, database, username, password}
+ * @param Config {server, port, db, username, password}
  * @parma Callback
  */
 function addMSSQLConnection(connName, config, cb) {
+
+  var dbmsEnum = constants.GetDbmsEnum(config.dbms);
+
+  cb(new Error('NotImplementedException'),
+    '아직 지원하지 않는 DBMS 입니다. [' + constants.dbmsStrs[dbmsEnum] + ']');
+
+  /*
   var conn = new sql.Connection(config);
 
   // mssql client 는 query 수행 전 직접 connection을 맺어줘야 함.
   // 맺어지지 않은 connection으로 query 수행시 에러를 반환함.
+  // mssql의 Connection 객체는 실제로는 pool 임에 주의.
 
   conn.connect(function res_connect(err) {
     if (err) {
@@ -130,23 +151,66 @@ function addMSSQLConnection(connName, config, cb) {
       cb(null, '연결 성공. [' + connName + ']');
     }
   });
+  */
+}
+
+/**
+ * Oracle Connection 객체 생성
+ * @param Conection Name
+ * @param Config
+ * @param Callback
+ */
+function addOracleConnection(connName, config, cb) {
+  var dbmsEnum = constants.GetDbmsEnum(config.dbms);
+
+  cb(new Error('NotImplementedException'),
+    '아직 지원하지 않는 DBMS 입니다. [' + constants.dbmsStrs[dbmsEnum] + ']');
 }
 
 /**
  * Maria Connection 객체 생성
  * @param Connection Name
- * @param Config {host, db, user, password}
+ * @param Config {server, port, db, username, password}
  * @param Callback
  */
 function addMariaConnection(connName, config, cb) {
-  var conn = new maria(config);
+  var _config = {
+    host: config.server,
+    port: config.port,
+    db: config.database,
+    user: config.username,
+    password: config.password,
+    charset: 'utf8'
+  };
+
+  var factory = {
+    create: function(cb) {
+      var client = new maria(_config);
+
+      client.on('error', function(err) {
+        debug('Exception occurs on maria: %O', err.stack);
+      });
+
+      cb(null, client);
+    },
+    destroy: function(client){
+      client.close();
+    }
+  };
+
+  var conn = gpool.createPool(factory, { max: 100, idleTimeoutMillis : 30000 });
 
   // mariasql client 는 직접 connection 연결을 할 필요가 없음.
-  // query 수행시 알아서 연결을 맺음.
+  // query 수행시 알아서 연결을 맺음. 즉, pool이 아닌 단일 connection임.
+  // pool 기능을 위해 generic-pool로 관리.
 
   _conns.set(connName, conn);
 
   cb(null, '연결 성공. [' + connName + ']');
 }
+
+process.on('exit', function() {
+
+});
 
 module.exports = pools;

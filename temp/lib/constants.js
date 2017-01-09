@@ -1,5 +1,3 @@
-'use strict';
-
 const dbmsEnums = Object.freeze(
   {
     MSSQL: 0,
@@ -18,7 +16,7 @@ const dbmsStrs = Object.freeze(
 
 // -------------------------------------------------
 // constants
-var constants = {
+const constants = {
   dbmsEnums: dbmsEnums,
   dbmsStrs: dbmsStrs,
 

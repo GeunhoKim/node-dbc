@@ -1,5 +1,3 @@
-'use strict';
-
 var oracle = require('oracledb');
 
 module.exports = {

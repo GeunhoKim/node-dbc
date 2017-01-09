@@ -1,5 +1,3 @@
-'use strict';
-
 var debug = require('debug')('connector/mssql');
 var sql = require('mssql');
 
