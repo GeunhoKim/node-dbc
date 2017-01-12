@@ -4,9 +4,9 @@ var mariasql = require('mariasql');
 // CONNECTOR FOR MARIASQL
 // -------------------------------------------------
 var maria = {
-  Prepare: mariasql.prepare,
 
-  Query: query
+  Query: query,
+  Prepare: prepare
 };
 
 /**
@@ -23,5 +23,8 @@ function query(conn, queryStr, params, cb) {
   conn.end();
 }
 
+function prepare(conn, queryStr, params) {
+  return conn.prepare(queryStr)(params);
+}
 
 module.exports = maria;

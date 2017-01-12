@@ -2,19 +2,27 @@
   "name": "node-dcm",
   "version": "0.0.1",
   "description": "Data Connection Manager for Nodejs",
-  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "http://github.ebaykorea.com/org-ebaykorea/node-dcm"
+  },
+  "main": "dcm.js",
+  "bin": { "dcm-cli": "./bin/dcm.js" },
+  "scripts": {
+    "//prepublish": "./node_modules/.bin/uglifyjs -o"
+  },
   "dependencies": {
     "config": "^1.21.0",
     "hashmap": "^2.0.6",
     "restify-clients": "^1.5.0",
     "mssql": "^3.3.0",
     "generic-pool": "^3.1.6",
-    "mariasql": "^0.2.6"
+    "mariasql": "^0.2.6",
+    "lru-cache": "^4.0.2",
+    "debug": "^2.2.0"
   },
   "devDependencies": {
-    "mocha": "^3.1.1",
-    "chai": "^3.5.0",
-    "debug": "^2.2.0",
-    "sqlite3": "^3.1.6"
+    "mocha": "~3.2.0",
+    "uglify-js": "~2.7.5"
   }
 }
