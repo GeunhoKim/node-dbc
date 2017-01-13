@@ -17,6 +17,11 @@
     "options": { "max": 10, "idleTimeoutMillis" : 30000 }
   },
   "dcm-test": {
+    "dcmService": {
+      "url": "http://dcmservicedev.testebaykorea.corp",
+      "principal": "archeadm@TESTEBAYKOREA.CORP",
+      "keytab": "./archeadm.keytab"
+    },
     "applicationName": "DCM_TEST",
     "connectionNames": ["testdb_read", "testdb_write"],
     "connections": [

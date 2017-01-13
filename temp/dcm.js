@@ -3,6 +3,7 @@ var hashmap = require('hashmap');
 
 var maria = require('./lib/connector/maria');
 var pools = require('./lib/pools.js');
+var delegator = require('./lib/delegator');
 
 var constants = require('./lib/constants');
 
@@ -28,10 +29,16 @@ function init(config, cb) {
 
   var connections = config["connections"];
 
-  if (connections)
-    initFromConnectionsConfig(connections, cb);
-  else
+  if (connections) { initFromConnectionsConfig(connections, cb); }
+  else {
+    var dcmService = config['dcmService'];
+
+    if(!dcmService)
+      cb(new Error('dcmService 설정이 부족합니다. 파라미터를 다시 확인 하십시오.'), null);
+
+    delegator.Init(dcmService);
     initFromWebService(config, cb);
+  }
 }
 
 /**
@@ -123,17 +130,22 @@ function initFromWebService(config, cb) {
   for(var idx in config.connectionNames) {
     var connName = config.connectionNames[idx];
 
-    pools.AddConnection(connName, connObj, function(err, msg) {
-      if(err) {
-        debug('error occurs while add a connection. %O', err.stack);
-      } else {
-        debug('add connection successfully. %O', msg);
-      }
+    delegator.GetConnectionString(config.applicationName, connName, function(err, connObj) {
+      if (err) cb(err, null);
+      else {
+        pools.AddConnection(connName, connObj, function (err, msg) {
+          if (err) {
+            debug('error occurs while add a connection. %O', err.stack);
+          } else {
+            debug('add connection successfully. %O', msg);
+          }
 
-      if(idx == config.connectionNames.length - 1) {
-        dcm.isInitializing = false;
-        dcm.isInitialized = true;
-        cb('initialize complete.');
+          if (idx == config.connectionNames.length - 1) {
+            dcm.isInitializing = false;
+            dcm.isInitialized = true;
+            cb('initialize complete.');
+          }
+        });
       }
     });
   }

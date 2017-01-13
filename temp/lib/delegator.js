@@ -2,19 +2,20 @@ var debug = require('debug')('delegator/kerberos');
 
 var url = require('url');
 var util = require('util');
+const http = require('http');
+const https = require('https');
 var krb5 = require('krb5');
-var http = null;
 
 var os = require('os');
 var pjson = require('../package.json');
-var serviceConfig = require('./config/delegator.json');
 const userAgent = 'DCM-Client/' + pjson.version + ' (' + os.type() + '; ' + os.release() + '; '
 + os.platform() + ')  NodeJS/' + process.versions.node;
 
+var argv = null;
 
 // DELEGATOR - KERBEROS SPNEGO
 // ------------------------------------------------------------------------------------
-var delegator = function(config) {
+var delegator = {
   /*
    {
    url: 'http://dcmservicedev.testebaykorea.corp,
@@ -22,29 +23,14 @@ var delegator = function(config) {
    keytab: './archeadm.keytab'
    }
    */
-  var argv = {
-    url: 'http://dcmservicedev.testebaykorea.corp/api/connection/DCM_TEST/gmkt_read',
-    principal: 'archeadm@TESTEBAYKOREA.CORP',
-    keytab: './archeadm.keytab'
-  };
+  Init: init,
+  GetConnectionString: getConnectionString
 
-  var options = url.parse(argv.url);
-  http = require(options.protocol.substr(0, options.protocol.length - 1));
-
-  if (options.protocol === 'https:') {
-    options.rejectUnauthorized = false
-  }
-
-  var module = {
-
-    GetConnectionString: getConnectionString
-
-  };
-
-  return module;
 };
 
-
+function init(config) {
+  argv = config;
+}
 
 /**
  *
@@ -55,7 +41,19 @@ var delegator = function(config) {
 function getConnectionString(applicationName, connectionName, cb) {
   var path = '/api/Connection/' + applicationName + '/' + connectionName;
 
-  http.get(options, function (res) {
+  var request = url.parse(argv.url + path);
+
+  // target module. http or https
+  var thttp = null;
+
+  if (request.protocol === 'https:') {
+    request.rejectUnauthorized = false;
+    thttp = https;
+  } else {
+    thttp = http;
+  }
+
+  thttp.get(request, function (res) {
     if (res.statusCode !== 401)
       cb(new Error('잘못된 요청입니다. DCM web service 설정을 확인 하십시오.'), null);
 
@@ -66,41 +64,46 @@ function getConnectionString(applicationName, connectionName, cb) {
     krb5.spnego({
       principal: argv.principal,
       keytab: argv.keytab,
-      service_principal: 'HTTP@' + options.hostname
+      service_principal: 'HTTP@' + request.hostname
     }, function (err, token) {
-      if (err) { return process.stderr.write('ERROR[1]: ' + err.message + '\n'); }
-      options.headers = {
+      if (err) cb(err, null);
+
+      request.headers = {
         'Authorization': 'Negotiate ' + token,
         'User-Agent': userAgent
       };
-      http.get(options, function (res) {
-        // Read the HTTP response
-        data = ''
+
+      thttp.get(request, function (res) {
+        var data = '';
+
         res.on('readable', function () {
           while (chunk = res.read()) {
-            data += chunk.toString()
+            data += chunk.toString();
           }
         }).on('end', function () {
-          process.stdout.write(util.inspect(JSON.parse(data), { depth: null, colors: true }));
+          var data = JSON.parse(data);
+          var result = {
+            'dbms': data['dbmsName'],
+            'server': data['server'],
+            'port': data['port'],
+            'database': data['database'],
+            'username': data['username'],
+            'password': data['password'],
+            'connectionString': data['connectionString']
+          };
+
+          cb(null, result);
         });
+
       }).on('error', function () {
-        process.stderr.write('ERROR[2]: ' + err.message + '\n');
+        cb(err, null);
       });
+
     });
+
   }).on('error', function (err) {
-    process.stderr.write('ERROR[3]: ' + err.message + '\n');
+    cb(err, null);
   });
-
 }
-
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
 
 module.exports = delegator;
