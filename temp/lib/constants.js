@@ -2,7 +2,7 @@ const dbmsEnums = Object.freeze(
   {
     MSSQL: 0,
     ORACLE: 1,
-    MARIA: 2
+    MARIADB: 2
   }
 );
 
@@ -10,7 +10,7 @@ const dbmsStrs = Object.freeze(
   {
     MSSQL: 'MSSQL',
     ORACLE: 'ORACLE',
-    MARIA: 'MARIA'
+    MARIA: 'MARIADB'
   }
 );
 

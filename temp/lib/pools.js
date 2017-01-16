@@ -42,30 +42,30 @@ var connstr = {
 /**
  *
  * @param ConnectionName
- * @param Config {dbms, server, port, db, username, password}
+ * @param ConnectionObject {dbms, server, port, db, username, password}
  * @param Callback
  */
-function addConnection(connName, config, cb) {
-  var dbmsEnum = constants.GetDbmsEnum(config.dbms);
+function addConnection(connName, connObj, cb) {
+  var dbmsEnum = constants.GetDbmsEnum(connObj.dbms);
 
   // 연결 풀 추가 전에 기존에 동일한 이름의 풀이 있다면 제거.
   closeConnection(connName, function(err, msg) {
       if(err) cb(err, msg);
       else {
-        _connmap.set(connName, config.dbms);
+        _connmap.set(connName, connObj.dbms);
 
         switch(dbmsEnum){
           case constants.dbmsEnums.MSSQL:
-            addMSSQLConnection(connName, config, cb);
+            addMSSQLConnection(connName, connObj, cb);
             break;
 
-          case constants.dbmsEnums.MARIA:
-            addMariaConnection(connName, config, cb);
+          case constants.dbmsEnums.MARIADB:
+            addMariaConnection(connName, connObj, cb);
             break;
 
           case constants.dbmsEnums.ORACLE:
           default:
-            addOracleConnection(connName, config, cb);
+            addOracleConnection(connName, connObj, cb);
             break;
         }
       }

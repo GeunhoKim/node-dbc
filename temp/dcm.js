@@ -55,7 +55,7 @@ function query(connName, query, param, cb) {
   var dbmsEnum = constants.GetDbmsEnum(dbmsType);
 
   switch(dbmsEnum) {
-    case constants.dbmsEnums.MARIA:
+    case constants.dbmsEnums.MARIADB:
       queryMaria(connName, query, param, cb);
       break;
 
@@ -117,28 +117,20 @@ function initFromConnectionsConfig(conns, cb) {
 
 function initFromWebService(config, cb) {
 
-  // TODO: web service client에서 연결 문자열 응답을 받아 저장.
-
-  var connObj = {
-    "dbms": "MARIA",
-    "server": "localhost"
-    , "port": "3306"
-    , "database": "testdb"
-    , "username": "root"
-    , "password": ""
-  };
-
-  var options = config['options'];
-  if(options) connObj.options = options;
 
   var connNum = 0;
-  const connLength = config.connectionNames.length;
+  const connLength = config['connectionNames'].length;
   for(idx = 0; idx < connLength; idx++) {
-    var connName = config.connectionNames[connNum];
+    var connName = config['connectionNames'][connNum];
 
-    delegator.GetConnectionString(config.applicationName, connName, function(err, connObj) {
-      if (err) cb(err, 'Exception occurs while requesting connection strings.');
-      else {
+    delegator.GetConnectionString(config['applicationName'], connName, function(err, connObj) {
+      if (err) {
+        cb(err, 'Exception occurs while requesting connection strings.');
+
+      } else {
+        var options = config['options'];
+        if(options) connObj.options = options;
+
         pools.AddConnection(connName, connObj, function (err, msg) {
           if (err) {
             debug('error occurs while add a connection. %O', err.stack);
