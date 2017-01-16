@@ -88,8 +88,10 @@ function initFromConnectionsConfig(conns, cb) {
    }, ...]
    */
 
-  for(idx = 0; idx < conns.length; idx++) {
-    var conn = conns[idx];
+  var connNum = 0;
+  const connLength = conns.length;
+  for(idx = 0; idx < connLength; idx++) {
+    var conn = conns[connNum];
     var connName = conn.connectionName;
     var connObj = conn.connection;
 
@@ -102,11 +104,13 @@ function initFromConnectionsConfig(conns, cb) {
         debug('add connection successfully. %O', msg);
       }
 
-      if(idx === conns.length - 1) {
+      if(connNum === connLength - 1) {
         dcm.isInitializing = false;
         dcm.isInitialized = true;
         cb(null, 'initialize complete.');
       }
+
+      connNum++;
     });
   }
 }
@@ -127,10 +131,12 @@ function initFromWebService(config, cb) {
   var options = config['options'];
   if(options) connObj.options = options;
 
-  for(var idx in config.connectionNames) {
-    var connName = config.connectionNames[idx];
+  var connNum = 0;
+  const connLength = config.connectionNames.length;
+  for(idx = 0; idx < connLength; idx++) {
+    var connName = config.connectionNames[connNum];
 
-    delegator.GetConnectionString(config.applicationName, connName, function(err, connObj) {
+    delegator.GetConnectionStrig(config.applicationName, connName, function(err, connObj) {
       if (err) cb(err, null);
       else {
         pools.AddConnection(connName, connObj, function (err, msg) {
@@ -140,11 +146,13 @@ function initFromWebService(config, cb) {
             debug('add connection successfully. %O', msg);
           }
 
-          if (idx == config.connectionNames.length - 1) {
+          if (connNum === connLength - 1) {
             dcm.isInitializing = false;
             dcm.isInitialized = true;
-            cb('initialize complete.');
+            cb(null, 'initialize complete.');
           }
+
+          connNum++;
         });
       }
     });

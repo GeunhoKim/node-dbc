@@ -93,6 +93,7 @@ function closeConnection(connName, cb) {
   switch(dbmsEnum) {
     case constants.dbmsEnums.MARIA:
       _conns.remove(connName);
+      _connmap.remove(connName);
 
       conn.drain().then(function() {
         conn.clear();

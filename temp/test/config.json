@@ -1,19 +1,19 @@
 {
   "mariasql-test-connection": {
-    "host": "localhost",
+    "host": "192.168.72.105",
     "port": "3306",
     "db": "testdb",
     "user": "root",
-    "password": "",
+    "password": "1234",
     "charset": "utf8"
   },
   "maria-test-pool": {
     "dbms": "MARIA",
-    "server": "localhost",
+    "server": "192.168.72.105",
     "port": "3306",
     "database": "testdb",
     "username": "root",
-    "password": "",
+    "password": "1234",
     "options": { "max": 10, "idleTimeoutMillis" : 30000 }
   },
   "dcm-test-configs": {
@@ -29,11 +29,23 @@
         "connectionName": "testdb_read",
         "connection": {
           "dbms": "MARIA",
-          "server": "localhost",
+          "server": "192.168.72.105",
           "port": "3306",
           "database": "testdb",
           "username": "root",
-          "password": "",
+          "password": "1234",
+          "options": { "max": 5, "idleTimeoutMillis": 30000 }
+        }
+      },
+      {
+        "connectionName": "testdb_write",
+        "connection": {
+          "dbms": "MARIA",
+          "server": "192.168.72.105",
+          "port": "3306",
+          "database": "testdb",
+          "username": "root",
+          "password": "1234",
           "options": { "max": 5, "idleTimeoutMillis": 30000 }
         }
       }
