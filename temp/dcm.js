@@ -99,7 +99,7 @@ function initFromConnectionsConfig(conns, cb) {
       if(err) {
         debug('error occurs while add a connection. %O', err.stack);
         cb(err, 'Exception occurs while initializing.');
-        return;
+
       } else {
         debug('add connection successfully. %O', msg);
       }
@@ -136,12 +136,14 @@ function initFromWebService(config, cb) {
   for(idx = 0; idx < connLength; idx++) {
     var connName = config.connectionNames[connNum];
 
-    delegator.GetConnectionStrig(config.applicationName, connName, function(err, connObj) {
-      if (err) cb(err, null);
+    delegator.GetConnectionString(config.applicationName, connName, function(err, connObj) {
+      if (err) cb(err, 'Exception occurs while requesting connection strings.');
       else {
         pools.AddConnection(connName, connObj, function (err, msg) {
           if (err) {
             debug('error occurs while add a connection. %O', err.stack);
+            cb(err, 'Exception occurs while initializing.');
+
           } else {
             debug('add connection successfully. %O', msg);
           }
