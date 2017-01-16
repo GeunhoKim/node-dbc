@@ -136,7 +136,7 @@ function initFromWebService(config, cb) {
   for(idx = 0; idx < connLength; idx++) {
     var connName = config.connectionNames[connNum];
 
-    delegator.GetConnectionStrig(config.applicationName, connName, function(err, connObj) {
+    delegator.GetConnectionString(config.applicationName, connName, function(err, connObj) {
       if (err) cb(err, null);
       else {
         pools.AddConnection(connName, connObj, function (err, msg) {
