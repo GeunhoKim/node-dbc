@@ -81,15 +81,15 @@ function getConnectionString(applicationName, connectionName, cb) {
             data += chunk.toString();
           }
         }).on('end', function () {
-          var data = JSON.parse(data);
+          var dt = JSON.parse(data);
           var result = {
-            'dbms': data['dbmsName'],
-            'server': data['server'],
-            'port': data['port'],
-            'database': data['database'],
-            'username': data['username'],
-            'password': data['password'],
-            'connectionString': data['connectionString']
+            'dbms': dt['dbmsName'],
+            'server': dt['server'],
+            'port': dt['port'],
+            'database': dt['database'],
+            'username': dt['username'],
+            'password': dt['password'],
+            'connectionString': dt['connectionString']
           };
 
           cb(null, result);

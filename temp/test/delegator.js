@@ -10,10 +10,10 @@ var delegator = require('../lib/delegator');
 // -----------------------------------------------------------------------
 describe('delegator', function() {
 
-  describe('#GetConnectionString("DCM_TEST", "gmkt_read", cb)', function() {
+  describe('#GetConnectionString("DCM_TEST", "testdb_read", cb)', function() {
     it('should get response from dcm web service without error.', function(done) {
       delegator.Init(config['dcm-test']['dcmService']);
-      delegator.GetConnectionString('DCM_TEST', 'gmkt_read', done);
+      delegator.GetConnectionString('DCM_TEST', 'testdb_read', done);
     })
   });
 });
