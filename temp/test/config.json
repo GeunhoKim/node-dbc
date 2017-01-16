@@ -8,7 +8,7 @@
     "charset": "utf8"
   },
   "maria-test-pool": {
-    "dbms": "MARIA",
+    "dbms": "MARIADB",
     "server": "192.168.72.105",
     "port": "3306",
     "database": "testdb",
@@ -28,7 +28,7 @@
       {
         "connectionName": "testdb_read",
         "connection": {
-          "dbms": "MARIA",
+          "dbms": "MARIADB",
           "server": "192.168.72.105",
           "port": "3306",
           "database": "testdb",
@@ -40,7 +40,7 @@
       {
         "connectionName": "testdb_write",
         "connection": {
-          "dbms": "MARIA",
+          "dbms": "MARIADB",
           "server": "192.168.72.105",
           "port": "3306",
           "database": "testdb",

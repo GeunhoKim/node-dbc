@@ -64,8 +64,11 @@ function addConnection(connName, connObj, cb) {
             break;
 
           case constants.dbmsEnums.ORACLE:
-          default:
             addOracleConnection(connName, connObj, cb);
+            break;
+
+          default:
+            cb(new Error('지원하지 않는 DBMS 이름입니다. ['+ connObj.dbms +']'));
             break;
         }
       }
@@ -91,7 +94,7 @@ function closeConnection(connName, cb) {
   var dbmsEnum = constants.GetDbmsEnum(dbms);
 
   switch(dbmsEnum) {
-    case constants.dbmsEnums.MARIA:
+    case constants.dbmsEnums.MARIADB:
       _conns.remove(connName);
       _connmap.remove(connName);
 

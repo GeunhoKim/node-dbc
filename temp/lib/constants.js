@@ -10,7 +10,7 @@ const dbmsStrs = Object.freeze(
   {
     MSSQL: 'MSSQL',
     ORACLE: 'ORACLE',
-    MARIA: 'MARIADB'
+    MARIADB: 'MARIADB'
   }
 );
 

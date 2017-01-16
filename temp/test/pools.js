@@ -9,7 +9,7 @@ var pools = require('../lib/pools');
 // POOLS TEST
 // -----------------------------------------------------------------------
 describe('pools', function() {
-  
+
   describe('#AddConnection("testdb_read", config, cb)', function() {
     it('should add "testdb_read" connection without error.', function(done) {
       pools.AddConnection('testdb_read', config['maria-test-pool'], done)
@@ -24,7 +24,7 @@ describe('pools', function() {
 
   describe('#GetDbmsType("testdb_read")', function() {
     it('should be MARIA.', function() {
-      assert.equal('MARIA', pools.GetDbmsType('testdb_read'))
+      assert.equal('MARIADB', pools.GetDbmsType('testdb_read'))
     })
   });
 
